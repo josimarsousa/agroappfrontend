@@ -20,7 +20,7 @@ export default function Page(){
       return
     }
 
-    console.log("Dados de login: ", { email, password})
+    console.log("Dados de login: ", { email, password })
 
     try {
       const response = await api.post("/session",{
@@ -39,7 +39,7 @@ export default function Page(){
         return
       }
 
-      console.log("token recebido", response.data)
+      console.log("token recebido", response.data )
 
       const expressTime = 60 * 60 *24 * 30 * 1000
       //se acusar o erro no cookies store use abaixo
