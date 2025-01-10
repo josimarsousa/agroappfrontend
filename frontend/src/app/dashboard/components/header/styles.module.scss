@@ -1,0 +1,46 @@
+.headercontainer{
+    height: 5rem; 
+    background-color: var(--ligthgreen);
+}
+
+.headercontent{
+    max-width: 1280px;
+    height: 5rem;
+    margin: 0 auto;
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+   
+
+    nav{
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        a{
+            color: var(--gray-100);
+            text-decoration: none;
+            transition: 0.5s;
+
+            &:hover{
+                color: var(--white);
+                transform: scale(1.5);
+            }
+        }
+
+        button{
+            border: 0;
+            color: var(--gray-100);
+            background: transparent;
+            margin-left: 16px;
+            transition: 0.5s;
+
+            &:hover{
+                transform: scale(1.5);
+                color: var(--white);
+            }
+        }
+    }
+}

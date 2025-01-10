@@ -1,0 +1,91 @@
+.dialogcontainer{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--lightgreen);
+    z-index: 999;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 16px;
+    backdrop-filter: blur(3px);
+ 
+}
+
+.dialogcontent{
+    background-color: var(--ligthgreen);
+    margin: auto;
+    padding: 16px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+    color: var(--black);
+
+    
+}
+
+.container{
+    background-color: var(--green-900);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+    margin-bottom: 25px;
+    
+    h2{
+      margin: 12px;
+      margin-top: 10px;
+      font-size: 20px;
+    }
+}
+
+.dialogback{
+    background-color: transparent;
+    border: 0;
+
+}
+
+.table{
+ 
+    background-color: rgb(242, 247, 251);
+    padding: 12px;
+    margin: 16px;
+    border-radius: 4px;
+    font-size: 16px;
+    gap: 10px;
+
+}
+
+.itemspedido{
+    display: flex;
+    flex-direction: column;
+    margin: 2px 15px;
+    font-size: 12px;
+    background-color: rgb(194, 206, 206);
+    border-radius: 8px;
+    padding: 6px;
+}
+
+.description{
+    color: rgba(0, 0, 0, 0.667);
+    margin-top: 4px;
+    
+}
+
+.buttonorder{
+    background-color: var(--green-900);
+    padding: 12px;
+    border-radius: 4px;
+    border: 0;
+    font-weight: bold;
+
+}
+
+.total{
+    margin: 25px 0 25px 14px;
+
+}

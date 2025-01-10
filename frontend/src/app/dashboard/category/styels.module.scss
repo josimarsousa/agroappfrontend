@@ -1,0 +1,31 @@
+.container{
+    max-width: 720px;
+    margin: 20px auto;
+    padding: 0 16px;
+
+    display: flex;
+    flex-direction: column;
+
+    h1{
+        color: var(--black)
+    }
+}
+
+.form{
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    margin: 16px 0;
+
+}
+
+.input{
+    height: 40px;
+    border: 0;
+    background-color: var(--black);
+    border-radius: 8px;
+    padding: 0 16px;
+    color: var(--gray-100);
+    border: 2px solid var(--gray-100);
+    font-size: 16px;
+}
