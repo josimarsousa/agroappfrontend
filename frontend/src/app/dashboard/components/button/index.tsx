@@ -11,7 +11,7 @@ export function Button({ name }: Props){
     const { pending } = useFormStatus()
 
     return(
-        <button type="submit" className={styles.button} >
+        <button type="submit" disabled={pending}className={styles.button} >
             {pending ? "Cadastrando..." : name}
         </button>
     )
