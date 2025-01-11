@@ -30,7 +30,6 @@ export default function Category(){
         })
 
         redirect("/dashboard")
-
     }
 
     return(
