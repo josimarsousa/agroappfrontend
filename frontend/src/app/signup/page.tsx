@@ -4,8 +4,6 @@ import styles from "../page.module.scss"
 import logoImg from "/public/logo-original.svg"
 import { api } from "@/services/api"
 import { redirect } from "next/navigation"
-import { response } from "express"
-
 
 export default function Signup(){
 
@@ -26,13 +24,13 @@ export default function Signup(){
         email,
         password
       })
-      console.log('resposta da api: ', response)
+      
      } catch (err) {
       console.log("error")
       console.log(err)
      }
 
-     redirect('/')
+     redirect("/")
     }
 
     return(
@@ -71,12 +69,12 @@ export default function Signup(){
             className={styles.input}
           />
 
-          <button className={styles.button}>
+          <button type="submit" className={styles.button}>
             Cadastrar
           </button>
         </form>
 
-        <Link href='/' className={styles.text}>
+        <Link href="/" className={styles.text}>
           Já possui uma conta? Faça o login
         </Link>
       </section>
