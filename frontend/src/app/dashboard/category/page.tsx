@@ -19,13 +19,13 @@ export default function Category(){
 
         const token = await getCookieServer()
 
-        await api.post("/categories", data,{
+        await api.post("/categories", data, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         })
         .catch((err) => {
-            console.log(err)
+            //console.log(err)
             return
         })
 
