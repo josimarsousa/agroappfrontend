@@ -7,7 +7,7 @@ import { redirect } from "next/navigation"
 
 export default function Signup(){
 
-    async function handleRegister(formData: FormData){
+   async function handleRegister(formData: FormData){
       "use server"
 
       const name = formData.get("name")
@@ -19,10 +19,10 @@ export default function Signup(){
       return
      }
      try {
-      await api.post("/users", {
-        name,
-        email,
-        password
+          await api.post("/users", {
+          name,
+          email,
+          password
       })
       
      } catch (err) {
