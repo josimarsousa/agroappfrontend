@@ -60,7 +60,7 @@ export function Form({categories}: Props){
         data.append("category_id", categories[Number(categoryIndex)].id)
         data.append("file", image)
 
-        const token = getCookieClient()
+        const token = await getCookieClient()
         
        await api.post("/products", data,  {
         headers: {
