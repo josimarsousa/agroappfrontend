@@ -1,145 +1,128 @@
-"use client"
+"use client" // Diretiva que marca este componente como Client Component
 
-import styles from "./styles.module.scss"
-import { Button } from "@/app/dashboard/components/button"
-import { api } from "@/services/api";
-import { getCookieClient } from "@/lib/cookieClient";
-import { UploadCloud } from "lucide-react";
-import { ChangeEvent, useState } from "react";
-import Image from 'next/image'
-import { toast } from "sonner";
-import { useRouter } from 'next/navigation'
+import { ChangeEvent, FormEvent, useState } from 'react';
+import styles from './styles.module.scss';
+import { Button } from '@/app/dashboard/components/button';
+import { api } from '@/services/api';
+import { getCookieClient } from '@/lib/cookieClient';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
-
-
-interface CategoryProps{
-    id: string;
-    name: string;
+interface CategoryProps {
+  id: string;
+  name: string;
 }
 
-interface Props{
-    categories: CategoryProps[];
+interface Props {
+  categories: CategoryProps[];
 }
 
-export function Form({categories}: Props){
-    const router = useRouter()
-    const [ image, setImage]= useState<File>()
-    const [ previewImage, setPreviewImage] = useState("")
+export function Form({ categories }: Props) {
+  const router = useRouter();
+  const [image, setImage] = useState<File>();
+  const [previewImage, setPreviewImage] = useState('');
 
-    function handleFile(e: ChangeEvent<HTMLInputElement>){
-        if(e.target.files && e.target.files[0]){
-            const image = e.target.files[0]
+  async function handleRegisterProduct(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-            if(image.type !== "image/jpeg" && image.type !== "image/png"){
-                toast.warning("formato inválico da imagem!")
-                return
-            }
-            setImage(image)
-            setPreviewImage(URL.createObjectURL(image))
-       
-        }
+    const formData = new FormData(event.currentTarget);
+    const name = formData.get('name') as string;
+    const price = formData.get('price') as string;
+    const description = formData.get('description') as string;
+    const categoryIndex = formData.get('category') as string;
+
+    if (!name || !categoryIndex || !price || !description || !image) {
+      toast.warning('Preencha todos os campos!');
+      return;
     }
 
-    async function handleRegisterProduct(formData: FormData) {
-        
-        const categoryIndex = formData.get("category")
-        const name = formData.get("name")
-        const price = formData.get("price")
-        const description = formData.get("description")
+    // Adicionando a imagem ao FormData
+    const data = new FormData();
+    data.append('name', name);
+    data.append('price', price);
+    data.append('description', description);
+    data.append('category_id', categories[Number(categoryIndex)].id);
+    data.append('file', image); // A imagem precisa ser adicionada aqui
 
-        if(!name || !categoryIndex || !price  || !description || !image){
-            toast("Preencha todos os campos!")
-            return
-        } 
+    // Obtendo o token de autenticação
+    const token = await getCookieClient();
+    console.log('Token:', token);  // Adicionando um log para verificar o token
 
-        const data = new FormData()
-
-        data.append("name", name)
-        data.append("price", price)
-        data.append("description", description)
-        data.append("category_id", categories[Number(categoryIndex)].id)
-        data.append("file", image)
-
-        const token = await getCookieClient()
-        
-       api.post("/product", data,{
+    try {
+      const response = await api.post('/product', data, {
         headers: {
-            Authorization: `Bearer ${token}`
-        }
-       })
-       .catch((err) => {
-        console.log(err)
-        toast.warning("Falha ao cadastrar o produto.")
-        return
-       })
-       
-       toast.success("Produto registrado com sucesso!")
-       router.push("/dashboard")
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Verificar a resposta da API para garantir que o produto foi registrado
+      console.log('Resposta da API:', response);
+
+      toast.success('Produto registrado com sucesso!');
+      router.push('/dashboard'); // Redirecionamento usando 'useRouter' do 'next/navigation'
+    } catch (err) {
+      console.error(err);
+      toast.warning('Falha ao cadastrar esse produto!');
     }
+  }
 
-    return(
-       <main className={styles.container}>
-            <h1>Novo Produto</h1>
+  function handleFile(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const selectedImage = e.target.files[0];
+      if (selectedImage.type !== 'image/jpeg' && selectedImage.type !== 'image/png') {
+        toast.warning('Formato não permitido!');
+        return;
+      }
+      setImage(selectedImage);
+      setPreviewImage(URL.createObjectURL(selectedImage));
+    }
+  }
 
-            <form className={styles.form} action={handleRegisterProduct}>
-            
-            <label className={styles.labelImage}>
-                <span>
-                    <UploadCloud size={36} color="#000"/>
-                </span>
+  return (
+    <main className={styles.container}>
+      <h1>Novo produto</h1>
+      <form className={styles.form} onSubmit={handleRegisterProduct}>
+        <select name="category">
+          {categories.map((category, index) => (
+            <option key={category.id} value={index}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+        <input
+          type="text"
+          name="name"
+          placeholder="Digite o nome do produto..."
+          required
+          className={styles.input}
+        />
+        <input
+          type="text"
+          name="price"
+          placeholder="Preço do produto..."
+          required
+          className={styles.input}
+        />
+        <textarea
+          className={styles.input}
+          placeholder="Digite a descrição do produto..."
+          required
+          name="description"
+        ></textarea>
 
-                <input 
-                   type="file"
-                   accept="image/png, image/jpeg"
-                   required
-                   onChange={handleFile} 
-                />
+        {/* Adicionando campo para upload de imagem */}
+        <input
+          type="file"
+          accept="image/jpeg, image/png"
+          required
+          onChange={handleFile}
+        />
+        {previewImage && (
+          <img src={previewImage} alt="Pré-visualização da imagem" className={styles.previewImage} />
+        )}
 
-                {previewImage && (
-                    <Image 
-                        alt="Imagem de preview"
-                        src={previewImage}
-                        className={styles.preview}
-                        fill={true}
-                        quality={100}
-                        priority={true}
-                    />
-                )}
-            </label>
-
-            <select name="category">
-              {categories.map( (category, index) => (
-                <option key={category.id} value={index}>
-                    {category.name}
-                </option>
-              ))}
-            </select>
-
-            <input 
-                type="text"
-                name="name"
-                placeholder="Digite o nome do produto"
-                required
-                className={styles.input}
-            />
-             <input 
-                type="text"
-                name="price"
-                placeholder="Preço do produto"
-                required
-                className={styles.input}
-            />
-            <textarea
-                className={styles.input}
-                placeholder="Descriçao do produto"
-                required
-                name="description"
-            ></textarea> 
-
-            <Button name="Cadastrar produto" />           
-
-            </form>
-       </main>
-    )
-
+        <Button name="Cadastrar produto" />
+      </form>
+    </main>
+  );
 }

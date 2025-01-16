@@ -3,6 +3,7 @@ import { api } from "@/services/api"
 import { getCookieServer } from "@/lib/cookieServer"
 
 
+
 export default async function Product(){
 
     const token =  await getCookieServer()
@@ -14,6 +15,7 @@ export default async function Product(){
     })
 
     return(
+      //<Form categories={response.data}/>
       <Form categories={response.data}/>
     )
 }
