@@ -5,7 +5,7 @@ import styles from './styles.module.scss';
 import { Button } from '@/app/dashboard/components/button';
 import { api } from '@/services/api';
 import { getCookieClient } from '@/lib/cookieClient';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import { useRouter } from 'next/navigation';
 
 interface CategoryProps {
@@ -49,7 +49,7 @@ export function Form({ categories }: Props) {
     console.log('Token:', token);  // Adicionando um log para verificar o token
 
     try {
-      const response = api.post('/product', data, {
+      const response = await api.post('/product', data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -58,7 +58,8 @@ export function Form({ categories }: Props) {
       // Verificar a resposta da API para garantir que o produto foi registrado
       console.log('Resposta da API:', response);
 
-      toast.success('Produto registrado com sucesso!');
+      toast.success('Produto registrado com sucesso!')
+      
       router.push('/dashboard'); // Redirecionamento usando 'useRouter' do 'next/navigation'
     } catch (err) {
       console.error(err);
