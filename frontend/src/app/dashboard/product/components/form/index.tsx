@@ -45,11 +45,11 @@ export function Form({ categories }: Props) {
     data.append('file', image); // A imagem precisa ser adicionada aqui
 
     // Obtendo o token de autenticação
-    const token = await getCookieClient();
+    const token = getCookieClient();
     console.log('Token:', token);  // Adicionando um log para verificar o token
 
     try {
-      const response = await api.post('/product', data, {
+      const response = api.post('/product', data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
