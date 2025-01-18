@@ -53,6 +53,7 @@ export function Form({ categories }: Props) {
       headers: {
         Authorization: `Bearer ${token}`
       }
+      
     })
     .catch((err) => {
       console.log(err)
