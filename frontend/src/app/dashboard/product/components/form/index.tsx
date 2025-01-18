@@ -3,6 +3,8 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
 import styles from './styles.module.scss';
 import { Button } from '@/app/dashboard/components/button';
+import { UploadCloud } from 'lucide-react';
+import Image from 'next/image'
 import { api } from '@/services/api';
 import { getCookieClient } from '@/lib/cookieClient';
 import { toast } from 'sonner';
@@ -21,16 +23,14 @@ export function Form({ categories }: Props) {
   const router = useRouter();
   const [image, setImage] = useState<File>();
   const [previewImage, setPreviewImage] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(''); // Estado para a categoria selecionada
 
-  async function handleRegisterProduct(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
+  async function handleRegisterProduct(formData: FormData) {
+    
+    const categoryIndex = formData.get("category")
     const name = formData.get('name') as string;
     const price = formData.get('price') as string;
     const description = formData.get('description') as string;
-    const categoryIndex = formData.get('category') as string;
+    
 
     if (!name || !categoryIndex || !price || !description || !image) {
       toast.warning('Preencha todos os campos!');
@@ -39,59 +39,75 @@ export function Form({ categories }: Props) {
 
     // Adicionando a imagem ao FormData
     const data = new FormData();
-    data.append('name', name);
-    data.append('price', price);
-    data.append('description', description);
-    data.append('category_id', categories[Number(categoryIndex)].id);
-    data.append('file', image);
+    data.append("name", name);
+    data.append("price", price);
+    data.append("description", description);
+    data.append("category_id", categories[Number(categoryIndex)].id);
+    data.append("file", image);
 
     // Obtendo o token de autenticação
     const token = getCookieClient();
     console.log('Token:', token); // Adicionando um log para verificar o token
 
-    try {
-      const response = await api.post('/product', data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    api.post("/product", data, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .catch((err) => {
+      console.log(err)
+      toast.warning("Falha ao cadastrar o produto")
+      return
+    })
 
-      console.log('Resposta da API:', response);
-
-      toast.success('Produto registrado com sucesso!');
-      router.push('/dashboard');
-    } catch (err) {
-      console.error(err);
-      toast.warning('Falha ao cadastrar esse produto!');
-    }
+    toast.success("Produto cadastrado com sucesso!")
+    router.push("/dashboard")
   }
 
   function handleFile(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
-      const selectedImage = e.target.files[0];
-      if (selectedImage.type !== 'image/jpeg' && selectedImage.type !== 'image/png') {
+      const image = e.target.files[0];
+      if (image.type !== 'image/jpeg' && image.type !== 'image/png') {
         toast.warning('Formato não permitido!');
         return;
       }
-      setImage(selectedImage);
-      setPreviewImage(URL.createObjectURL(selectedImage));
+      setImage(image);
+      setPreviewImage(URL.createObjectURL(image));
     }
   }
-
-  // Função para lidar com a mudança de categoria
-  const handleCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(event.target.value);
-  };
 
   return (
     <main className={styles.container}>
       <h1>Novo produto</h1>
-      <form className={styles.form} onSubmit={handleRegisterProduct}>
-        <select
-          name="category"
-          value={selectedCategory} // Controla o valor selecionado
-          onChange={handleCategoryChange} // Atualiza o estado quando a categoria mudar
-        >
+      <form className={styles.form} action={handleRegisterProduct}>
+        
+       <label className={styles.labelImage}>
+
+        <span>
+          <UploadCloud size={30} color="#000"/>
+        </span>
+
+        <input
+          type="file"
+          accept="image/jpeg, image/png"
+          required
+          onChange={handleFile}
+        />
+
+        {previewImage && (
+          <Image
+            alt="Imagem de preview"
+            src={previewImage}
+            className={styles.preview}
+            fill={true}
+            quality={100}
+            priority={true}
+          />
+        )}
+
+       </label>
+
+        <select name="category">
           {categories.map((category, index) => (
             <option key={category.id} value={index}>
               {category.name}
@@ -118,17 +134,6 @@ export function Form({ categories }: Props) {
           required
           name="description"
         ></textarea>
-
-        {/* Adicionando campo para upload de imagem */}
-        <input
-          type="file"
-          accept="image/jpeg, image/png"
-          required
-          onChange={handleFile}
-        />
-        {previewImage && (
-          <img src={previewImage} alt="Pré-visualização da imagem" className={styles.previewImage} />
-        )}
 
         <Button name="Cadastrar produto" />
       </form>
