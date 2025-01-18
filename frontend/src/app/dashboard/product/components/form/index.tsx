@@ -25,19 +25,16 @@ export function Form({ categories }: Props) {
   const [previewImage, setPreviewImage] = useState('');
 
   async function handleRegisterProduct(formData: FormData) {
-    
-    const categoryIndex = formData.get("category")
+    const categoryIndex = formData.get("category");
     const name = formData.get('name') as string;
     const price = formData.get('price') as string;
     const description = formData.get('description') as string;
-    
 
     if (!name || !categoryIndex || !price || !description || !image) {
-      toast.warning('Preencha todos os campos!');
-      return;
+        toast.warning('Preencha todos os campos!');
+        return;
     }
 
-    // Adicionando a imagem ao FormData
     const data = new FormData();
     data.append("name", name);
     data.append("price", price);
@@ -45,37 +42,42 @@ export function Form({ categories }: Props) {
     data.append("category_id", categories[Number(categoryIndex)].id);
     data.append("file", image);
 
-    // Obtendo o token de autenticação
     const token = getCookieClient();
-    console.log('Token:', token); // Adicionando um log para verificar o token
+    console.log('Token:', token);
 
-    api.post("/product", data, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-      
-    })
-    .catch((err) => {
-      console.log(err)
-      toast.warning("Falha ao cadastrar o produto")
-      return
-    })
+    try {
+        // Espera a requisição ser concluída antes de exibir o toast de sucesso
+        await api.post("/product", data, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
-    toast.success("Produto cadastrado com sucesso!")
-    router.push("/dashboard")
-  }
+        toast.success("Produto cadastrado com sucesso!");
+        router.push("/dashboard");
+    } catch (err) {
+        console.log(err);
+        toast.warning("Falha ao cadastrar o produto");
+    }
+}
 
-  function handleFile(e: ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files[0]) {
+
+function handleFile(e: ChangeEvent<HTMLInputElement>) {
+  if (e.target.files && e.target.files[0]) {
       const image = e.target.files[0];
+      if (image.size > 5 * 1024 * 1024) { // 5MB
+          toast.warning('A imagem é muito grande. Máximo permitido: 5MB.');
+          return;
+      }
       if (image.type !== 'image/jpeg' && image.type !== 'image/png') {
-        toast.warning('Formato não permitido!');
-        return;
+          toast.warning('Formato não permitido!');
+          return;
       }
       setImage(image);
       setPreviewImage(URL.createObjectURL(image));
-    }
   }
+}
+
 
   return (
     <main className={styles.container}>
