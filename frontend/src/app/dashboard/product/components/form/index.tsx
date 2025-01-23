@@ -9,6 +9,8 @@ import { api } from '@/services/api';
 import { getCookieClient } from '@/lib/cookieClient';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { clear } from 'console';
+import { AxiosError } from 'axios';
 
 interface CategoryProps {
   id: string;
@@ -23,6 +25,33 @@ export function Form({ categories }: Props) {
   const router = useRouter();
   const [image, setImage] = useState<File>();
   const [previewImage, setPreviewImage] = useState('');
+
+  function handleError(err: unknown) {
+    // Verifica se o erro é uma instância de AxiosError
+    if (err instanceof AxiosError) {
+        // Quando a resposta está presente
+        if (err.response) {
+            // Você pode customizar como deseja exibir o erro
+            const errorMessage = err.response.data?.message || err.response.statusText;
+
+            // Exibe uma notificação de erro para o usuário
+            toast.warning(`Erro: ${errorMessage}`);
+            console.error('Erro ao cadastrar produto:', errorMessage);
+        } else {
+            // Se não houver resposta (problema de rede ou algo no servidor)
+            toast.warning("Falha ao conectar com o servidor. Tente novamente.");
+            console.error('Erro de rede ou servidor:', err.message);
+        }
+    } else if (err instanceof Error) {
+        // Caso o erro seja um erro genérico
+        toast.warning(`Erro desconhecido: ${err.message}`);
+        console.error('Erro desconhecido:', err);
+    } else {
+        // Caso o erro não seja do tipo esperado
+        toast.warning("Erro desconhecido. Tente novamente mais tarde.");
+        console.error('Erro desconhecido:', err);
+    }
+}
 
   async function handleRegisterProduct(formData: FormData) {
     const categoryIndex = formData.get("category");
@@ -56,8 +85,18 @@ export function Form({ categories }: Props) {
         toast.success("Produto cadastrado com sucesso!");
         router.push("/dashboard");
     } catch (err) {
+      handleError(err)
+      /*const axiosError = err as AxiosError
+
+      console.error('Erro ao cadastrar o produto', axiosError)
+
+      if( axiosError.response){
+        console.error('Erro de resposta', axiosError.response.status)
+        console.error('mensagem: ', axiosError.response.data)
+        
+      }
         console.log(err);
-        toast.warning("Falha ao cadastrar o produto");
+        toast.warning("Falha ao cadastrar o produto");*/
     }
 }
 
@@ -65,7 +104,7 @@ export function Form({ categories }: Props) {
 function handleFile(e: ChangeEvent<HTMLInputElement>) {
   if (e.target.files && e.target.files[0]) {
       const image = e.target.files[0];
-      if (image.size > 5 * 1024 * 1024) { // 5MB
+      if (image.size > 50 * 1024 * 1024) { // 5MB
           toast.warning('A imagem é muito grande. Máximo permitido: 5MB.');
           return;
       }
@@ -110,7 +149,7 @@ function handleFile(e: ChangeEvent<HTMLInputElement>) {
 
        </label>
 
-        <select name="category">
+        <select name="category" required>
           {categories.map((category, index) => (
             <option key={category.id} value={index}>
               {category.name}
